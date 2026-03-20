@@ -1,5 +1,4 @@
 import sys
-import asyncio
 from handlers.commands import (
     handle_start, handle_help, handle_health,
     handle_scores, handle_labs, handle_unknown
