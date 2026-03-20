@@ -23,6 +23,7 @@ def handle_test(command: str) -> str:
         return handle_unknown(command)
 
 def run_bot():
+    import asyncio
     from telegram.ext import ApplicationBuilder, CommandHandler
     from config import BOT_TOKEN
     from handlers.commands import (
@@ -41,13 +42,19 @@ def run_bot():
     async def labs(update, context):
         await update.message.reply_text(handle_labs())
 
-    app = ApplicationBuilder().token(BOT_TOKEN).build()
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("help", help_cmd))
-    app.add_handler(CommandHandler("health", health))
-    app.add_handler(CommandHandler("labs", labs))
-    print("Bot is running...")
-    app.run_polling()
+    async def main():
+        app = ApplicationBuilder().token(BOT_TOKEN).build()
+        app.add_handler(CommandHandler("start", start))
+        app.add_handler(CommandHandler("help", help_cmd))
+        app.add_handler(CommandHandler("health", health))
+        app.add_handler(CommandHandler("labs", labs))
+        print("Bot is running...")
+        async with app:
+            await app.start()
+            await app.updater.start_polling()
+            await asyncio.Event().wait()
+
+    asyncio.run(main())
 
 if __name__ == "__main__":
     if "--test" in sys.argv:
