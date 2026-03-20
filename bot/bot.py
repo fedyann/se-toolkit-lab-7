@@ -23,8 +23,8 @@ def handle_test(command: str) -> str:
     else:
         return handle_unknown(command)
 
-async def run_bot():
-    from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
+def run_bot():
+    from telegram.ext import ApplicationBuilder, CommandHandler
     from config import BOT_TOKEN
     from handlers.commands import (
         handle_start, handle_help, handle_health, handle_labs
@@ -58,4 +58,4 @@ if __name__ == "__main__":
         print(result)
         sys.exit(0)
     else:
-        asyncio.run(run_bot())
+        run_bot()
