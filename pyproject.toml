@@ -1,5 +1,5 @@
 [tool.uv.workspace]
-members = ["backend", "bot"]
+members = ["backend"]
 
 [dependency-groups]
 dev = [
