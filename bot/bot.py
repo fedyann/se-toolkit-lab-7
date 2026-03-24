@@ -1,5 +1,6 @@
 import sys
 import asyncio
+import signal
 from handlers.commands import (
     handle_start, handle_help, handle_health,
     handle_scores, handle_labs, handle_unknown
@@ -8,7 +9,6 @@ from handlers.commands import (
 def handle_test(command: str) -> str:
     parts = command.strip().split()
     cmd = parts[0].lower()
-
     if cmd == "/start":
         return handle_start()
     elif cmd == "/help":
@@ -23,12 +23,9 @@ def handle_test(command: str) -> str:
     else:
         return handle_unknown(command)
 
-async def run_bot():
-    from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
+async def main():
+    from telegram.ext import ApplicationBuilder, CommandHandler
     from config import BOT_TOKEN
-    from handlers.commands import (
-        handle_start, handle_help, handle_health, handle_labs
-    )
 
     async def start(update, context):
         await update.message.reply_text(handle_start())
@@ -47,15 +44,24 @@ async def run_bot():
     app.add_handler(CommandHandler("help", help_cmd))
     app.add_handler(CommandHandler("health", health))
     app.add_handler(CommandHandler("labs", labs))
+
     print("Bot is running...")
-    app.run_polling()
+    async with app:
+        await app.start()
+        await app.updater.start_polling()
+        stop_event = asyncio.Event()
+        loop = asyncio.get_running_loop()
+        loop.add_signal_handler(signal.SIGTERM, stop_event.set)
+        loop.add_signal_handler(signal.SIGINT, stop_event.set)
+        await stop_event.wait()
+        await app.updater.stop()
+        await app.stop()
 
 if __name__ == "__main__":
     if "--test" in sys.argv:
         idx = sys.argv.index("--test")
         command = sys.argv[idx + 1] if idx + 1 < len(sys.argv) else "/help"
-        result = handle_test(command)
-        print(result)
+        print(handle_test(command))
         sys.exit(0)
     else:
-        asyncio.run(run_bot())
+        asyncio.run(main())
