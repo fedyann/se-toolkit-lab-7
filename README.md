@@ -91,3 +91,27 @@ By the end of this lab, you should be able to say:
 2. [Backend Integration](./lab/tasks/required/task-2.md) — P0: slash commands + real data
 3. [Intent-Based Natural Language Routing](./lab/tasks/required/task-3.md) — P1: LLM tool use
 4. [Containerize and Document](./lab/tasks/required/task-4.md) — P3: containerize + deploy
+
+
+## Deploy
+
+### Required environment variables
+
+Set these in `.env.docker.secret`:
+
+- `BOT_TOKEN` — Telegram bot token from @BotFather
+- `LMS_API_KEY` — Backend API key
+- `LLM_API_KEY` — Qwen Code API key
+- `LLM_API_BASE_URL` — LLM proxy URL (use `http://host.docker.internal:42005/v1` in Docker)
+- `LLM_API_MODEL` — Model name (e.g. `coder-model`)
+
+### Start all services
+```terminal
+docker compose --env-file .env.docker.secret up --build -d
+```
+
+### Verify deployment
+```terminal
+docker compose --env-file .env.docker.secret ps
+curl -sf http://localhost:42002/docs
+```
