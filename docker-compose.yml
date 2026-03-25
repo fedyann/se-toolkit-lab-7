@@ -95,12 +95,10 @@ services:
       - .env.docker.secret
     environment:
       - LMS_API_URL=http://backend:8000
-      - LLM_API_BASE_URL=http://host.docker.internal:42005/v1
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    restart: unless-stopped
+      - LLM_API_BASE_URL=http://172.19.0.1:42005/v1
     networks:
       - lms-network
+    restart: unless-stopped
     depends_on:
       - backend
 
